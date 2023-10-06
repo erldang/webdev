@@ -28,6 +28,29 @@ public class TodoService {
 		return repository.findByUserId(userId);
 	}
 	
+	public Optional<TodoEntity>update(final TodoEntity entity){
+		validate(entity);
+		if(repository.existsById(entity.getId())) {
+			repository.save(entity);
+		}
+		else throw new RuntimeException("Unknown id");
+		
+		return repository.findById(entity.getId());
+	}
+	
+	public Optional<TodoEntity>updateTodo(final TodoEntity entity) {
+		validate(entity);
+		
+		final Optional<TodoEntity> orignal = repository.findById(entity.getId());
+		
+		orignal.ifPresent(todo -> {
+			todo.setTitle(entity.getTitle());
+			todo.setDone(entity.isDone());
+			repository.save(todo);
+		});
+		return repository.findById(entity.getId());
+	}
+	
 	public void validate(final TodoEntity entity) {
 		if(entity == null) {
 			log.warn("Entity cannot be null.");
